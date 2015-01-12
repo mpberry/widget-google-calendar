@@ -29,6 +29,7 @@
       },
       "timeFormat": "12hour",
       "showEnd": "always",
+      "showCompleted": false,
       "timeFont": {
         "font": {
           "family": "Verdana"

@@ -58,6 +58,10 @@
       expect(element(by.id("show-end")).getAttribute("value")).to.eventually.equal("always");
     });
 
+    it("Show Completed Events should be checked", function () {
+      expect(element(by.model("settings.additionalParams.showCompleted")).isSelected()).to.eventually.be.true;
+    });
+
     it("Should hide date format", function () {
       expect(element(by.id("date-format")).isDisplayed()).to.eventually.be.false;
     });
@@ -142,6 +146,7 @@
           },
           "timeFormat": "12hour",
           "showEnd": "always",
+          "showCompleted": true,
           "titleFont": {
             "bold": true,
             "font": {

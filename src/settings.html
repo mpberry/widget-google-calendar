@@ -48,6 +48,13 @@
                 {{"google-calendar.calendar.error.required" | translate}}
               </p>
             </div>
+            <div class="form-group">
+              <div class="checkbox">
+                <label for="show-completed">
+                  <input type="checkbox" ng-model="settings.additionalParams.showCompleted">{{"google-calendar.time.show-completed" | translate}}
+                </label>
+              </div>
+            </div>
             <scroll-setting scroll="settings.additionalParams.scroll"></scroll-setting>
             <div class="section">
               <h5>{{"google-calendar.date.heading" | translate}}</h5>
