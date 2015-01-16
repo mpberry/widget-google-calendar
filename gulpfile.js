@@ -116,7 +116,8 @@
 
   // Widget
   gulp.task("html:e2e:widget", factory.htmlE2E({
-    files: htmlFiles
+    files: htmlFiles,
+    e2eMockData: "../test/data/main.js"
   }));
 
   gulp.task("e2e:server:widget", ["config", "html:e2e:widget"], factory.testServer());

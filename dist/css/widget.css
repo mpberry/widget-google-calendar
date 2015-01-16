@@ -23,8 +23,8 @@ ul {
   list-style-type: none;
 }
 
-.time {
-  margin-right: 10px;
+.day {
+  padding-top: 10px;
 }
 
 .events {
@@ -32,8 +32,16 @@ ul {
   border-bottom: 1px solid gray;
 }
 
-.day {
-  padding-top: 10px;
+.event {
+  margin-bottom: 15px;
+}
+
+.time {
+  margin-right: 10px;
+}
+
+.description {
+  margin: 15px 0 0 0;
 }
 
 .error {

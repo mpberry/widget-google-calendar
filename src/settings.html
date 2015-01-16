@@ -59,6 +59,13 @@
             <div class="section">
               <h5>{{"google-calendar.date.heading" | translate}}</h5>
               <div class="form-group">
+                <div class="checkbox">
+                  <label for="show-date">
+                    <input id="show-date" type="checkbox" ng-model="settings.additionalParams.showDate">{{"google-calendar.date.show" | translate}}
+                  </label>
+                </div>
+              </div>
+              <div class="form-group" ng-show="showDate">
                 <label for="date-range">{{"google-calendar.date.range.label" | translate }}</label>
                 <div class="row">
                   <div class="col-xs-6 col-md-3">
@@ -80,7 +87,7 @@
                   </div>
                 </div>
               </div>
-              <div class="form-group" ng-show="showDateFormat">
+              <div class="form-group" ng-show="showDate && showDateFormat">
                 <label for="date-format">{{"google-calendar.date.format.label" | translate}}</label>
                 <div class="row">
                   <div class="col-xs-6 col-md-3">
@@ -98,13 +105,22 @@
                   </div>
                 </div>
               </div>
-              <label>{{"google-calendar.date.font.label" | translate}}</label>
-              <font-setting id="date-font" font-data="settings.additionalParams.dateFont" hide-alignment="true" preview-text="{{'google-calendar.date.font.text' | translate}}">
-              </font-setting>
+              <div class="form-group" ng-show="showDate">
+                <label>{{"google-calendar.date.font.label" | translate}}</label>
+                <font-setting id="date-font" font-data="settings.additionalParams.dateFont" hide-alignment="true" preview-text="{{'google-calendar.date.font.text' | translate}}">
+                </font-setting>
+              </div>
             </div>
             <div class="section">
               <h5>{{"google-calendar.time.heading" | translate}}</h5>
               <div class="form-group">
+                <div class="checkbox">
+                  <label for="show-time">
+                    <input id="show-time" type="checkbox" ng-model="settings.additionalParams.showTime">{{"google-calendar.time.show" | translate}}
+                  </label>
+                </div>
+              </div>
+              <div class="form-group" ng-show="showTime">
                 <label for="time-format">{{"google-calendar.time.format.label" | translate}}</label>
                 <div class="row">
                   <div class="col-xs-6 col-md-3">
@@ -115,7 +131,7 @@
                   </div>
                 </div>
               </div>
-              <div class="form-group">
+              <div class="form-group" ng-show="showTime">
                 <label for="show-end">{{ "google-calendar.time.show-end.label" | translate }}</label>
                 <div class="row">
                   <div class="col-xs-6 col-md-3">
@@ -128,26 +144,54 @@
                   </div>
                 </div>
               </div>
-              <div class="form-group">
+              <div class="form-group" ng-show="showTime">
                 <label>{{"google-calendar.time.font.label" | translate}}</label>
                 <font-setting id="time-font" font-data="settings.additionalParams.timeFont" hide-alignment="true" preview-text="{{'google-calendar.time.font.text' | translate}}">
                 </font-setting>
               </div>
             </div>
             <div class="section">
+              <h5>{{"google-calendar.title.heading" | translate}}</h5>
               <div class="form-group">
-                <label>{{"google-calendar.title-font.label" | translate}}</label>
-                <font-setting id="title-font" font-data="settings.additionalParams.titleFont" hide-alignment="true" review-text="{{'google-calendar.title-font.text' | translate}}">
+                <div class="checkbox">
+                  <label for="show-title">
+                    <input id="show-title" type="checkbox" ng-model="settings.additionalParams.showTitle">{{"google-calendar.title.show" | translate}}
+                  </label>
+                </div>
+              </div>
+              <div class="form-group" ng-show="showTitle">
+                <label>{{"google-calendar.title.label" | translate}}</label>
+                <font-setting id="title-font" font-data="settings.additionalParams.titleFont" hide-alignment="true" preview-text="{{'google-calendar.title.text' | translate}}">
                 </font-setting>
               </div>
+            </div>
+            <div class="section">
+              <h5>{{"google-calendar.location.heading" | translate}}</h5>
               <div class="form-group">
-                <label>{{"google-calendar.location-font.label" | translate}}</label>
-                <font-setting id="location-font" font-data="settings.additionalParams.locationFont" hide-alignment="true" preview-text="{{'google-calendar.location-font.text' | translate}}">
+                <div class="checkbox">
+                  <label for="show-location">
+                    <input id="show-location" type="checkbox" ng-model="settings.additionalParams.showLocation">{{"google-calendar.location.show" | translate}}
+                  </label>
+                </div>
+              </div>
+              <div class="form-group" ng-show="showLocation">
+                <label>{{"google-calendar.location.label" | translate}}</label>
+                <font-setting id="location-font" font-data="settings.additionalParams.locationFont" hide-alignment="true" preview-text="{{'google-calendar.location.text' | translate}}">
                 </font-setting>
               </div>
+            </div>
+            <div class="section">
+              <h5>{{"google-calendar.description.heading" | translate}}</h5>
               <div class="form-group">
-                <label>{{"google-calendar.description-font.label" | translate}}</label>
-                <font-setting id="description-font" font-data="settings.additionalParams.descriptionFont" hide-alignment="true" preview-text="{{'google-calendar.description-font.text' | translate}}">
+                <div class="checkbox">
+                  <label for="show-description">
+                    <input id="show-description" type="checkbox" ng-model="settings.additionalParams.showDescription">{{"google-calendar.description.show" | translate}}
+                  </label>
+                </div>
+              </div>
+              <div class="form-group" ng-show="showDescription">
+                <label>{{"google-calendar.description.label" | translate}}</label>
+                <font-setting id="description-font" font-data="settings.additionalParams.descriptionFont" hide-alignment="true" preview-text="{{'google-calendar.description.text' | translate}}">
                 </font-setting>
               </div>
             </div>

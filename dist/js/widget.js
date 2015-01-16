@@ -5405,25 +5405,29 @@ RiseVision.Calendar.Day = function(params) {
       length,
       date,
       currentDate = events[0].start.dateTime ? events[0].start.dateTime : events[0].start.date,
-      eventParams = {},
       $day = $(".day").eq(pos);
 
-    if (params.dateRange === "day") {
-      date = "Today";
-    }
-    else if (params.dateRange === "week") {
-      if (moment(currentDate).isSame(moment(), "day")) {
+    if (params.showDate) {
+      if (params.dateRange === "day") {
         date = "Today";
       }
-      else {
-        date = moment(currentDate).format("dddd");
+      else if (params.dateRange === "week") {
+        if (moment(currentDate).isSame(moment(), "day")) {
+          date = "Today";
+        }
+        else {
+          date = moment(currentDate).format("dddd");
+        }
       }
+      else {
+        date = moment(currentDate).format(params.dateFormat);
+      }
+
+      $day.find(".date").text(date);
     }
     else {
-      date = moment(currentDate).format(params.dateFormat);
+      $day.find(".date").hide();
     }
-
-    $day.find(".date").text(date);
 
     // Clone the UI for each additional event after the first.
     for (i = 1, length = events.length; i < length; i++) {
@@ -5432,10 +5436,7 @@ RiseVision.Calendar.Day = function(params) {
 
     // Add all of the events for the current day.
     $.each(events, function(index, value) {
-      eventParams.timeFormat = params.timeFormat;
-      eventParams.showEnd = params.showEnd;
-
-      RiseVision.Calendar.Event.addEvent($day, index, value, eventParams);
+      RiseVision.Calendar.Event.addEvent($day, index, value, params);
     });
   }
 
@@ -5462,48 +5463,62 @@ RiseVision.Calendar.Event = (function () {
       showEnd = params.showEnd,
       duration = 0;
 
-    if (timeFormat === "12hour") {
-      timeFormat = "h:mma";
-    }
-    else {
-      timeFormat = "HH:mm";
-    }
-
-    // Start and End Times
-    if (event.start && event.end && event.start.dateTime && event.end.dateTime) {
-      if (showEnd === "hour" || showEnd === "extended") {
-        // Event duration in minutes.
-        duration = Math.round(moment(event.end.dateTime).diff(moment(event.start.dateTime)) / 60000);
-
-        // For events exactly one hour long.
-        if (showEnd === "hour" && duration === 60) {
-          showEnd = "always";
-        }
-        // For events longer than one hour.
-        else if (showEnd === "extended" && duration > 60) {
-          showEnd = "always";
-        }
-      }
-
-      if (showEnd === "always") {
-        $day.find(".time").eq(pos).text(moment(event.start.dateTime).format(timeFormat) +
-          " - " + moment(event.end.dateTime).format(timeFormat));
+    if (params.showTime) {
+      if (timeFormat === "12hour") {
+        timeFormat = "h:mma";
       }
       else {
-        $day.find(".time").eq(pos).text(moment(event.start.dateTime).format(timeFormat));
+        timeFormat = "HH:mm";
+      }
+
+      // Start and End Times
+      if (event.start && event.end && event.start.dateTime && event.end.dateTime) {
+        if (showEnd === "hour" || showEnd === "extended") {
+          // Event duration in minutes.
+          duration = Math.round(moment(event.end.dateTime).diff(moment(event.start.dateTime)) / 60000);
+
+          // For events exactly one hour long.
+          if (showEnd === "hour" && duration === 60) {
+            showEnd = "always";
+          }
+          // For events longer than one hour.
+          else if (showEnd === "extended" && duration > 60) {
+            showEnd = "always";
+          }
+        }
+
+        if (showEnd === "always") {
+          $day.find(".time").eq(pos).text(moment(event.start.dateTime).format(timeFormat) +
+            " - " + moment(event.end.dateTime).format(timeFormat));
+        }
+        else {
+          $day.find(".time").eq(pos).text(moment(event.start.dateTime).format(timeFormat));
+        }
       }
     }
+    else {
+      $day.find(".time").eq(pos).hide();
+    }
 
-    if (event.summary) {
+    if (params.showTitle && event.summary) {
       $day.find(".summary").eq(pos).html(event.summary);
     }
-
-    if (event.location) {
-      $day.find(".location").eq(pos).html(event.location);
+    else {
+      $day.find(".summary").eq(pos).hide();
     }
 
-    if (event.description) {
+    if (params.showLocation && event.location) {
+      $day.find(".location").eq(pos).html(event.location);
+    }
+    else {
+      $day.find(".location").eq(pos).hide();
+    }
+
+    if (params.showDescription && event.description) {
       $day.find(".description").eq(pos).html(event.description);
+    }
+    else {
+      $day.find(".description").eq(pos).hide();
     }
   }
 
