@@ -1,10 +1,9 @@
 var system = require("system");
 var e2ePort = system.env.E2E_PORT || 8099;
-var totalEvents = 10;
+var totalDays = 7;
+var totalEvents = 11;
 
 casper.test.begin("Google Calendar Widget - e2e Testing", function (test) {
-  casper.options.waitTimeout = 5000;
-
   casper.start("http://localhost:"+e2ePort+"/src/widget-e2e.html",
     function () {
       test.assertTitle("Google Calendar Widget", "Test page has loaded");
@@ -14,7 +13,7 @@ casper.test.begin("Google Calendar Widget - e2e Testing", function (test) {
   casper.waitFor(
     function check() {
       return this.evaluate(function() {
-        return document.querySelectorAll(".day").length === 6;
+        return document.querySelectorAll(".day").length === 7;
       });
     },
     function then() {
@@ -34,8 +33,8 @@ casper.test.begin("Google Calendar Widget - e2e Testing", function (test) {
           return moment(singleStartTime).format("h:mma") + " - " + moment(singleEndTime).format("h:mma");
         });
 
-        test.assertElementCount(".day", 6, "There are 6 days");
-        test.assertElementCount(".event", totalEvents, "There are " + totalEvents + " events");
+        test.assertElementCount(".day", totalDays, "Number of days showing is correct");
+        test.assertElementCount(".event", totalEvents, "Number of events showing is correct");
         test.assertSelectorHasText(".day:nth-child(1) .date", date, "Date is correct");
 
         casper.test.comment("Single event");
