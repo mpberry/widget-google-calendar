@@ -42,6 +42,7 @@ angular.module("risevision.widget.googleCalendar.settings")
       },
       "timeFormat": "12hour",
       "showEnd": "always",
+      "showCompleted": true,
       "titleFont": {
         "bold": true
       },
