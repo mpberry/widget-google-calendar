@@ -30188,7 +30188,6 @@ angular.module("risevision.widget.googleCalendar.settings")
     function ($scope) {
       $scope.showDateFormat = false;
       $scope.dateFormatValue = "D/M/YYYY";
-
       $scope.currentDate = new Date();
 
       $scope.$watch("settings.additionalParams.dateFormat", function (format) {
@@ -30215,26 +30214,27 @@ angular.module("risevision.widget.googleCalendar.settings")
 
     }])
   .value("defaultSettings", {
-    params: {},
-    additionalParams: {
-      calendar: "",
-      scroll: {},
-      dateRange: "day",
-      dateFont: {
-        bold: true
+    "params": {},
+    "additionalParams": {
+      "calendar": "",
+      "scroll": {},
+      "dateRange": "day",
+      "dateFont": {
+        "bold": true
       },
-      timeFont: {
-        bold: true
+      "timeFont": {
+        "bold": true
       },
-      timeFormat: "12hour",
-      titleFont: {
-        bold: true
+      "timeFormat": "12hour",
+      "showEnd": "always",
+      "titleFont": {
+        "bold": true
       },
-      locationFont: {
-        bold: true
+      "locationFont": {
+        "bold": true
       },
-      descriptionFont: {
-        size: "18"
+      "descriptionFont": {
+        "size": "18"
       }
     }
   });

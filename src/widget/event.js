@@ -10,7 +10,11 @@ RiseVision.Calendar.Event = (function () {
   /*
    *  Public Methods
    */
-  function add($day, pos, event, timeFormat) {
+  function add($day, pos, event, params) {
+    var timeFormat = params.timeFormat,
+      showEnd = params.showEnd,
+      duration = 0;
+
     if (timeFormat === "12hour") {
       timeFormat = "h:mma";
     }
@@ -18,9 +22,29 @@ RiseVision.Calendar.Event = (function () {
       timeFormat = "HH:mm";
     }
 
+    // Start and End Times
     if (event.start && event.end && event.start.dateTime && event.end.dateTime) {
-      $day.find(".time").eq(pos).text(moment(event.start.dateTime).format(timeFormat) +
-        " - " + moment(event.end.dateTime).format(timeFormat));
+      if (showEnd === "hour" || showEnd === "extended") {
+        // Event duration in minutes.
+        duration = Math.round(moment(event.end.dateTime).diff(moment(event.start.dateTime)) / 60000);
+
+        // For events exactly one hour long.
+        if (showEnd === "hour" && duration === 60) {
+          showEnd = "always";
+        }
+        // For events longer than one hour.
+        else if (showEnd === "extended" && duration > 60) {
+          showEnd = "always";
+        }
+      }
+
+      if (showEnd === "always") {
+        $day.find(".time").eq(pos).text(moment(event.start.dateTime).format(timeFormat) +
+          " - " + moment(event.end.dateTime).format(timeFormat));
+      }
+      else {
+        $day.find(".time").eq(pos).text(moment(event.start.dateTime).format(timeFormat));
+      }
     }
 
     if (event.summary) {

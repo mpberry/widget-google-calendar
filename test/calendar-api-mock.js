@@ -59,11 +59,11 @@
             {
               "description": "Lacrosse Training with Dr. Anderson",
               "end": {
-                "dateTime": moment().hour(7).minute(0).second(0).add(9, "days").format()
+                "dateTime": moment().hour(10).minute(30).second(0).add(9, "days").format()
               },
               "location": "Lacrosse Court",
               "start": {
-                "dateTime": moment().hour(10).minute(30).second(0).add(9, "days").format()
+                "dateTime": moment().hour(7).minute(0).second(0).add(9, "days").format()
               },
               "summary": "All Lacrosse team members are expected to attend training every Monday."
             },
