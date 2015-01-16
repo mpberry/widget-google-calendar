@@ -21,6 +21,7 @@ RiseVision.Calendar.Day = function(params) {
       length,
       date,
       currentDate = events[0].start.dateTime ? events[0].start.dateTime : events[0].start.date,
+      eventParams = {},
       $day = $(".day").eq(pos);
 
     if (params.dateRange === "day") {
@@ -47,7 +48,10 @@ RiseVision.Calendar.Day = function(params) {
 
     // Add all of the events for the current day.
     $.each(events, function(index, value) {
-      RiseVision.Calendar.Event.addEvent($day, index, value, params.timeFormat);
+      eventParams.timeFormat = params.timeFormat;
+      eventParams.showEnd = params.showEnd;
+
+      RiseVision.Calendar.Event.addEvent($day, index, value, eventParams);
     });
   }
 

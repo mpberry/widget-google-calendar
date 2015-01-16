@@ -28,6 +28,7 @@
         "highlightColor": "transparent"
       },
       "timeFormat": "12hour",
+      "showEnd": "always",
       "timeFont": {
         "font": {
           "family": "Verdana"
