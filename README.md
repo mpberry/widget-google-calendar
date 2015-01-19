@@ -4,16 +4,46 @@
 
 The Google Calendar Widget allows users to show a public Google calendar in a Presentation.
 
+### Custom Layouts
+A custom layout is defined inside an HTML file. This means that in order to build your own layout, you'll need to create an HTML page and mark the appropriate elements with IDs and CSS class names that will map them to the corresponding data and functionality. A good starting point may be to copy *widget.html* and make your customizations to this new version. The naming conventions that the Widget uses can be found below:
+
+ID            | Description
+------------- | -------------
+*container*   | Element that encapsulates all other HTML. This should be the first element after the *body* tag.
+*days*        | Element that encapsulates all calendar data.
+
+Class         | Description
+------------- | -------------
+*page*        | Element to be scrolled when *Scroll By* is set to *Page*.
+*day*         | Container element for a particular day.
+*date*        | "Today" if *Range* is *Day*, day of the week if *Range* is *Week*, or date if *Range* is anything else.
+*events*      | Container element for all events on a particular day.
+*event*       | Container element for an individual event.
+*time*        | Time of the event.
+*summary*     | Title of the event.
+*location*    | Location of the event.
+*description* | Description of the event.
+*error*       | Show error messages.
+
 Google Calendar Widget works in conjunction with [Rise Vision](http://www.risevision.com), the [digital signage management application](http://rva.risevision.com/) that runs on [Google Cloud](https://cloud.google.com).
 
 At this time Chrome is the only browser that this project and Rise Vision supports.
 
 ## Built With
 - [AngularJS](https://angularjs.org/)
+- [jQuery](http://jquery.com/)
+- [Bootstrap](http://getbootstrap.com/)
+- [Spectrum Colorpicker](https://bgrins.github.io/spectrum/)
+- [Greensock | GSAP](https://greensock.com/gsap) *(Please note there are special licensing requirements in order to use some of this functionality.)*
+- [Moment.js](http://momentjs.com/)
+- [moment-range](https://github.com/gf3/moment-range)
+- [Underscore.js](http://underscorejs.org/)
+- [Javascript Client Library](https://developers.google.com/api-client-library/javascript/dev/dev_jscript)
+- [i18next](http://i18next.com/)
 - [npm](https://www.npmjs.org)
 - [Bower](http://bower.io/)
 - [Gulp](http://gulpjs.com/)
-- [Karma](http://karma-runner.github.io/0.12/index.html) and [Mocha](http://mochajs.org/) for testing
+- [Protractor](http://angular.github.io/protractor/#/), [CasperJS](http://casperjs.org/), [Karma](http://karma-runner.github.io/0.12/index.html), [Mocha](http://mochajs.org/), [Chai](http://chaijs.com/) and [Chai as Promised](https://github.com/domenic/chai-as-promised/) for testing
 
 ## Development
 
@@ -24,23 +54,28 @@ At this time Chrome is the only browser that this project and Rise Vision suppor
 * [Gulp](http://gulpjs.com/) - Gulp is a Javascript task runner. It lints, runs unit and E2E (end-to-end) tests, minimizes files, etc. Gulp tasks are defined in _gulpfile.js_.
 
 ### Local Development Environment Setup and Installation
-To make changes to the Widget, you'll first need to install the dependencies:
+To make changes to the Widget, you'll first need to install [Git](http://git-scm.com/book/en/v2/Getting-Started-Installing-Git).
 
-- [Git](http://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+The Widget can now be installed by executing the following command at the command line:
+```
+git clone https://github.com/Rise-Vision/widget-google-calendar.git
+```
+
+If you want to get up and running quickly without having to install npm, Bower and Gulp, then you can make your code changes directly to the files in the `dist` folder. Please keep in mind that by doing so, you won't be able to take advantage of the many benefits that these tools provide, such as managing dependencies and running automated tests & builds. Should you decide that you would like to use these tools, you will first need to install them:
+
 - [Node.js and npm](http://blog.nodeknockout.com/post/65463770933/how-to-install-node-js-and-npm)
 - [Bower](http://bower.io/#install-bower) - To install Bower, run the following command in Terminal: `npm install -g bower`. Should you encounter any errors, try running the following command instead: `sudo npm install -g bower`.
 - [Gulp](https://github.com/gulpjs/gulp/blob/master/docs/getting-started.md) - To install Gulp, run the following command in Terminal: `npm install -g gulp`. Should you encounter any errors, try running the following command instead: `sudo npm install -g gulp`.
 
-The Widget can now be installed by executing the following commands in Terminal:
+Next, perform these additional steps at the command line:
 ```
-git clone https://github.com/Rise-Vision/widget-google-calendar.git
 cd widget-google-calendar
 npm install
 bower install
 gulp build
 ```
 
-The source code for the Widget can be found in the `src` folder. This is where you will want to make your custom changes.
+The source code for the Widget can be found in the `src` folder, and this is where you can make any necessary code changes.
 
 ### Run Locally
 To preview Widgets locally, you'll need to use the [Widget Preview](https://github.com/Rise-Vision/widget-preview) app available [here](http://192.254.220.36/~rvi/widget-preview/).
@@ -57,7 +92,7 @@ Once you are satisifed with your changes, run `gulp build` again, which will reg
 ![Add a Widget](https://cloud.githubusercontent.com/assets/1190420/5113377/2f2d9240-6ffd-11e4-98ad-a484c1fa7183.png)
 
 ## Submitting Issues
-If you encounter problems or find defects we really want to hear about them. If you could take the time to add them as issues to this Repository it would be most appreciated. When reporting issues please use the following format where applicable:
+If you encounter problems or find defects we really want to hear about them. If you could take the time to add them as issues to this Repository it would be most appreciated. When reporting issues, please use the following format where applicable:
 
 **Reproduction Steps**
 
@@ -74,22 +109,17 @@ What you expected to happen.
 What actually happened. (screenshots / video captures always help)
 
 ## Contributing
-All contributions are greatly appreciated and welcome! If you would first like to sound out your contribution ideas please post your thoughts to our [community](http://community.risevision.com), otherwise submit a pull request and we will do our best to incorporate it
+All contributions are greatly appreciated and welcome! If you would first like to sound out your contribution ideas, please post your thoughts to our [community](http://community.risevision.com), otherwise submit a pull request and we will do our best to incorporate it. Please be sure to submit corresponding E2E and unit tests where appropriate.
 
 ### Languages
-If you would like translate the user interface for this product to another language please complete the following:
-- Download the english translation file from this repository.
-- Download and install POEdit. This is software that you can use to write translations into another language.
-- Open the translation file in the [POEdit](http://www.poedit.net/) program and set the language for which you are writing a translation.
-- In the Source text window, you will see the English word or phrase to be translated. You can provide a translation for it in the Translation window.
-- When the translation is complete, save it with a .po extension and email the file to support@risevision.com. Please be sure to indicate the Widget or app the translation file is for, as well as the language that it has been translated into, and we will integrate it after the translation has been verified.
+If you would like to translate the user interface for this product to another language, please refer to the [common-i18n](https://github.com/Rise-Vision/common-i18n) repository.
 
 ## Resources
-If you have any questions or problems please don't hesitate to join our lively and responsive community at http://community.risevision.com.
+If you have any questions or problems, please don't hesitate to join our lively and responsive community at http://community.risevision.com.
 
-If you are looking for user documentation on Rise Vision please see http://www.risevision.com/help/users/
+If you are looking for user documentation on Rise Vision, please see http://www.risevision.com/help/users/
 
-If you would like more information on developing applications for Rise Vision please visit http://www.risevision.com/help/developers/.
+If you would like more information on developing applications for Rise Vision, please visit http://www.risevision.com/help/developers/.
 
 **Facilitator**
 

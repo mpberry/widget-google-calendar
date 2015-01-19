@@ -12,7 +12,8 @@
   browser.driver.manage().window().setSize(1024, 768);
 
   describe("Google Calendar Settings - e2e Testing", function() {
-    var calendarId = "mycalendarid";
+    var calendarId = "mycalendarid",
+      customURL = "http://www.test.com";
 
     beforeEach(function () {
       browser.get("/src/settings-e2e.html");
@@ -41,6 +42,10 @@
 
     it("Should load description font setting", function () {
       expect(element(by.css("#description-font font-picker")).isPresent()).to.eventually.be.true;
+    });
+
+    it("Should not load layout URL setting", function () {
+      expect(element(by.id("url-entry")).isPresent()).to.eventually.be.false;
     });
 
     // Defaults
@@ -134,6 +139,11 @@
       expect(element(by.id("description-font")).isDisplayed()).to.eventually.be.false;
     });
 
+    it("Should show URL when Use Default Layout is unchecked", function () {
+      element(by.model("settings.additionalParams.layout.default")).click();
+      expect(element(by.id("url-entry")).isDisplayed()).to.eventually.be.true;
+    });
+
     // Validity
     it("ng-invalid should be true", function () {
       expect(element(by.css("form[name=settingsForm].ng-invalid")).isPresent()).to.eventually.be.true;
@@ -171,10 +181,24 @@
       expect(element(by.css("button#save[disabled=disabled")).isPresent()).to.eventually.be.false;
     });
 
+    it("ng-invalid should be true when Use Default Layout is unchecked", function () {
+      element(by.model("settings.additionalParams.layout.default")).click();
+      expect(element(by.css("form[name=settingsForm].ng-invalid")).isPresent()).to.eventually.be.true;
+    });
+
+    it("ng-invalid should be false when Use Default Layout is unchecked and a URL is entered", function () {
+      element(by.css("input[name=calendar]")).sendKeys(calendarId);
+      element(by.model("settings.additionalParams.layout.default")).click();
+      element(by.id("url")).sendKeys(customURL);
+      expect(element(by.css("form[name=settingsForm].ng-invalid")).isPresent()).to.eventually.be.false;
+    });
+
     // Saving
     it("Should correctly save settings", function (done) {
       var settings = {
-        "params": {},
+        "params": {
+          "layoutURL": ""
+        },
         "additionalParams": {
           "calendar": calendarId,
           "showCompleted": true,
@@ -255,16 +279,22 @@
             "underline": false,
             "color": "black",
             "highlightColor": "transparent"
+          },
+          "layout": {
+            "default": false,
+            "customURL": customURL
           }
         }
       };
 
-      element(by.css("input[name=calendar]")).sendKeys(calendarId);
+      element(by.model("settings.additionalParams.calendar")).sendKeys(calendarId);
+      element(by.model("settings.additionalParams.layout.default")).click();
+      element(by.id("url")).sendKeys(customURL);
       element(by.id("save")).click();
 
       expect(browser.executeScript("return window.result")).to.eventually.deep.equal({
-        "additionalParams": JSON.stringify(settings.additionalParams),
-        "params": ""
+        "params": customURL + "?",
+        "additionalParams": JSON.stringify(settings.additionalParams)
       });
     });
   });

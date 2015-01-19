@@ -6,6 +6,7 @@
 
   window.gadget.settings = {
     "params": {
+      "layoutURL": ""
     },
     "additionalParams": {
       "calendar": "calendarID",
@@ -78,6 +79,10 @@
         "underline": false,
         "color": "black",
         "highlightColor": "transparent"
+      },
+      "layout": {
+        "default": true,
+        "customURL": ""
       }
     }
   };

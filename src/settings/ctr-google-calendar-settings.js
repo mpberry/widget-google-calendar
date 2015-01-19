@@ -1,6 +1,6 @@
 angular.module("risevision.widget.googleCalendar.settings")
-  .controller("calendarSettingsController", ["$scope",
-    function ($scope) {
+  .controller("calendarSettingsController", ["$scope", "defaultLayout",
+    function ($scope, defaultLayout) {
       $scope.showDateFormat = false;
       $scope.dateFormatValue = "D/M/YYYY";
       $scope.currentDate = new Date();
@@ -66,9 +66,31 @@ angular.module("risevision.widget.googleCalendar.settings")
         }
       });
 
+      // Use Default Layout
+      $scope.$watch("settings.additionalParams.layout.default", function(isDefaultLayout) {
+        if (isDefaultLayout !== undefined) {
+          if (isDefaultLayout) {
+            $scope.settings.params.layoutURL = defaultLayout;
+          }
+          else {
+            $scope.settings.params.layoutURL = $scope.settings.additionalParams.layout.customURL;
+          }
+        }
+      });
+
+      // Custom Layout URL
+      $scope.$watch("settings.additionalParams.layout.customURL", function (url) {
+        if (url !== undefined) {
+          if (!$scope.settings.additionalParams.layout.default) {
+            $scope.settings.params.layoutURL = url;
+          }
+        }
+      });
     }])
   .value("defaultSettings", {
-    "params": {},
+    "params": {
+      "layoutURL": ""
+    },
     "additionalParams": {
       "calendar": "",
       "showCompleted": true,
@@ -95,6 +117,10 @@ angular.module("risevision.widget.googleCalendar.settings")
       "showDescription": true,
       "descriptionFont": {
         "size": "18"
+      },
+      "layout": {
+        "default": true,
+        "customURL": ""
       }
     }
   });

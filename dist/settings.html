@@ -190,6 +190,19 @@
                 </font-setting>
               </div>
             </div>
+            <div class="section">
+              <h5>{{"widgets.layout.heading" | translate}}</h5>
+              <div class="checkbox">
+                <label>
+                  <input type="checkbox" ng-model="settings.additionalParams.layout.default">
+                  {{"widgets.layout.default.label" | translate}}
+                </label>
+              </div>
+              <div id="url-entry" ng-if="!settings.additionalParams.layout.default">
+                <url-field url="settings.additionalParams.layout.customURL"
+                  company-id="{{settings.params.companyId}}" ng-model="urlentry" valid></url-field>
+              </div>
+            </div>
           </form>
         </div>
       </div>
