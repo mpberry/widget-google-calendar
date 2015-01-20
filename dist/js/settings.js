@@ -29866,8 +29866,10 @@ if (typeof config === "undefined") {
   };
 }
 
-
 if (typeof angular !== "undefined") {
+  angular.module("risevision.widget.googleCalendar.config", [])
+    .value("defaultLayout", "widget.html");
+
   angular.module("risevision.common.i18n.config", [])
     .constant("LOCALES_PREFIX",
       "components/rv-common-i18n/dist/locales/translation_")
@@ -29875,12 +29877,14 @@ if (typeof angular !== "undefined") {
 }
 
 angular.module("risevision.widget.googleCalendar.settings", [
+  "risevision.widget.googleCalendar.config",
   "risevision.common.i18n",
   "risevision.widget.common",
   "risevision.widget.common.tooltip",
   "risevision.widget.common.widget-button-toolbar",
   "risevision.widget.common.scroll-setting",
-  "risevision.widget.common.font-setting"
+  "risevision.widget.common.font-setting",
+  "risevision.widget.common.url-field"
 ]);
 
 angular.module("risevision.widget.common", []);
@@ -30184,8 +30188,8 @@ angular.module("risevision.widget.common")
 })(angular);
 
 angular.module("risevision.widget.googleCalendar.settings")
-  .controller("calendarSettingsController", ["$scope",
-    function ($scope) {
+  .controller("calendarSettingsController", ["$scope", "defaultLayout",
+    function ($scope, defaultLayout) {
       $scope.showDateFormat = false;
       $scope.dateFormatValue = "D/M/YYYY";
       $scope.currentDate = new Date();
@@ -30251,9 +30255,31 @@ angular.module("risevision.widget.googleCalendar.settings")
         }
       });
 
+      // Use Default Layout
+      $scope.$watch("settings.additionalParams.layout.default", function(isDefaultLayout) {
+        if (isDefaultLayout !== undefined) {
+          if (isDefaultLayout) {
+            $scope.settings.params.layoutURL = defaultLayout;
+          }
+          else {
+            $scope.settings.params.layoutURL = $scope.settings.additionalParams.layout.customURL;
+          }
+        }
+      });
+
+      // Custom Layout URL
+      $scope.$watch("settings.additionalParams.layout.customURL", function (url) {
+        if (url !== undefined) {
+          if (!$scope.settings.additionalParams.layout.default) {
+            $scope.settings.params.layoutURL = url;
+          }
+        }
+      });
     }])
   .value("defaultSettings", {
-    "params": {},
+    "params": {
+      "layoutURL": ""
+    },
     "additionalParams": {
       "calendar": "",
       "showCompleted": true,
@@ -30280,6 +30306,10 @@ angular.module("risevision.widget.googleCalendar.settings")
       "showDescription": true,
       "descriptionFont": {
         "size": "18"
+      },
+      "layout": {
+        "default": true,
+        "customURL": ""
       }
     }
   });
@@ -30579,6 +30609,222 @@ app.run(["$templateCache", function($templateCache) {
     "    <div class=\"font-picker-text form-group\">\n" +
     "      <span>{{previewText}}</span>\n" +
     "    </div>\n" +
+    "  </div>\n" +
+    "</div>\n" +
+    "");
+}]);
+})();
+
+if (typeof angular !== "undefined") {
+  angular.module("risevision.widget.common.storage-selector.config", [])
+    .value("STORAGE_MODAL", "http://storage.risevision.com/storage-modal.html#/files/");
+}
+
+(function () {
+
+  "use strict";
+
+  angular.module("risevision.widget.common.storage-selector", [
+    "ui.bootstrap",
+    "risevision.widget.common.storage-selector.config"
+  ])
+  .directive("storageSelector", ["$window", "$templateCache", "$modal", "$sce", "$log", "STORAGE_MODAL",
+    function($window, $templateCache, $modal, $sce, $log, STORAGE_MODAL){
+      return {
+        restrict: "EA",
+        scope : {
+          local: "@",
+          useCtrl: "@",
+          instanceTemplate: "@",
+          companyId : "@"
+        },
+        template: $templateCache.get("storage-selector.html"),
+        link: function (scope) {
+
+          scope.storageUrl = "";
+
+          scope.open = function() {
+            var modalInstance = $modal.open({
+              templateUrl: scope.instanceTemplate || "storage.html",
+              controller: scope.useCtrl || "StorageCtrl",
+              size: "lg",
+              backdrop: true,
+              resolve: {
+                storageUrl: function () {
+                  return {url: $sce.trustAsResourceUrl(scope.storageUrl)};
+                }
+              }
+            });
+
+            modalInstance.result.then(function (files) {
+              // emit an event with name "files", passing the array of files selected from storage
+              scope.$emit("picked", files);
+
+            }, function () {
+              $log.info("Modal dismissed at: " + new Date());
+            });
+
+          };
+
+          if (scope.local){
+            scope.storageUrl = STORAGE_MODAL + "local";
+          } else {
+            scope.$watch("companyId", function (companyId) {
+              if (companyId) {
+                scope.storageUrl = STORAGE_MODAL + companyId;
+              }
+            });
+          }
+        }
+      };
+   }
+  ]);
+})();
+
+
+
+angular.module("risevision.widget.common.storage-selector")
+  .controller("StorageCtrl", ["$scope", "$modalInstance", "storageUrl", "$window", "$log",
+    function($scope, $modalInstance, storageUrl, $window/*, $log*/){
+
+    $scope.storageUrl = storageUrl;
+
+    $window.addEventListener("message", function (event) {
+      if (event.origin !== "http://storage.risevision.com") { return; }
+
+      if (Array.isArray(event.data)) {
+        $modalInstance.close(event.data);
+      } else if (typeof event.data === "string") {
+        if (event.data === "close") {
+          $modalInstance.dismiss("cancel");
+        }
+      }
+    });
+
+  }]);
+
+(function(module) {
+try { app = angular.module("risevision.widget.common.storage-selector"); }
+catch(err) { app = angular.module("risevision.widget.common.storage-selector", []); }
+app.run(["$templateCache", function($templateCache) {
+  "use strict";
+  $templateCache.put("storage-selector.html",
+    "<button class=\"btn btn-widget-icon-storage\" ng-click=\"open()\" type=\"button\" />\n" +
+    "<script type=\"text/ng-template\" id=\"storage.html\">\n" +
+    "        <iframe class=\"modal-dialog\" scrolling=\"no\" marginwidth=\"0\" src=\"{{ storageUrl.url }}\"></iframe>\n" +
+    "</script>\n" +
+    "");
+}]);
+})();
+
+(function () {
+  "use strict";
+
+  angular.module("risevision.widget.common.url-field",
+    ["risevision.common.i18n",
+    "risevision.widget.common.tooltip",
+    "risevision.widget.common.storage-selector"])
+
+    .directive("urlField", ["$templateCache", "$log", function ($templateCache, $log) {
+      return {
+        restrict: "E",
+        require: "?ngModel",
+        scope: {
+          url: "=",
+          hideLabel: "@",
+          hideStorage: "@",
+          companyId: "@"
+        },
+        template: $templateCache.get("_angular/url-field/url-field.html"),
+        link: function (scope, element, attrs, ctrl) {
+
+          function testUrl(value) {
+            var urlRegExp;
+
+            /*
+             Discussion
+             http://stackoverflow.com/questions/37684/how-to-replace-plain-urls-with-links#21925491
+
+             Using
+             https://gist.github.com/dperini/729294
+             Reasoning
+             http://mathiasbynens.be/demo/url-regex */
+
+            /* jshint ignore:start */
+            urlRegExp = /^(?:(?:https?|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:\/[^\s]*)?$/i;
+            /* jshint ignore:end */
+
+            // Add http:// if no protocol parameter exists
+            if (value.indexOf("://") === -1) {
+              value = "http://" + value;
+            }
+
+            return urlRegExp.test(value);
+          }
+
+          // By default enforce validation
+          scope.doValidation = true;
+          // A flag to set if the user turned off validation
+          scope.forcedValid = false;
+          // Validation state
+          scope.valid = true;
+
+          if (!scope.hideStorage) {
+            scope.$on("picked", function (event, data) {
+              scope.url = data[0];
+            });
+          }
+
+          scope.$watch("url", function (url) {
+            if (url && scope.doValidation) {
+              scope.valid = testUrl(scope.url);
+            }
+          });
+
+          scope.$watch("valid", function (valid) {
+            if (ctrl) {
+              $log.info("Calling $setValidity() on parent controller");
+              ctrl.$setValidity("valid", valid);
+            }
+          });
+
+          scope.$watch("doValidation", function (doValidation) {
+            if(typeof scope.url !== "undefined") {
+              if (doValidation) {
+                scope.forcedValid = false;
+                scope.valid = testUrl(scope.url);
+              } else {
+                scope.forcedValid = true;
+                scope.valid = true;
+              }
+            }
+          });
+
+        }
+      };
+    }]);
+}());
+
+(function(module) {
+try { app = angular.module("risevision.widget.common.url-field"); }
+catch(err) { app = angular.module("risevision.widget.common.url-field", []); }
+app.run(["$templateCache", function($templateCache) {
+  "use strict";
+  $templateCache.put("_angular/url-field/url-field.html",
+    "<div class=\"form-group\" >\n" +
+    "  <label for=\"url\" ng-if=\"!hideLabel\">{{ \"url.label\" | translate }}</label>\n" +
+    "  <div ng-class=\"{'input-group':!hideStorage}\">\n" +
+    "    <input id=\"url\" name=\"url\" type=\"text\" ng-model=\"url\" class=\"form-control\" placeholder=\"http://\">\n" +
+    "    <span class=\"input-url-addon\" ng-if=\"!hideStorage\"><storage-selector company-id=\"{{companyId}}\"></storage-selector></span>\n" +
+    "  </div>\n" +
+    "  <p ng-if=\"!valid\" class=\"help-block\">{{ \"url.invalid\" | translate }}</p>\n" +
+    "  <div class=\"checkbox\" ng-show=\"forcedValid || !valid\">\n" +
+    "    <label>\n" +
+    "      <input name=\"validate-url\" ng-click=\"doValidation = !doValidation\" type=\"checkbox\"\n" +
+    "             value=\"validate-url\" checked=\"checked\"> {{\"url.validate.label\" | translate}}\n" +
+    "    </label>\n" +
+    "    <span popover=\"{{'url.validate.tooltip' | translate}}\" popover-trigger=\"click\"\n" +
+    "          popover-placement=\"top\" rv-tooltip></span>\n" +
     "  </div>\n" +
     "</div>\n" +
     "");

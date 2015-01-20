@@ -6,8 +6,10 @@ if (typeof config === "undefined") {
   };
 }
 
-
 if (typeof angular !== "undefined") {
+  angular.module("risevision.widget.googleCalendar.config", [])
+    .value("defaultLayout", "widget.html");
+
   angular.module("risevision.common.i18n.config", [])
     .constant("LOCALES_PREFIX",
       "components/rv-common-i18n/dist/locales/translation_")

@@ -149,6 +149,7 @@
       "node_modules/widget-tester/mocks/common-mock.js",
       "src/components/bootstrap-sass-official/assets/javascripts/bootstrap.js",
       "src/components/angular-bootstrap/ui-bootstrap-tpls.js",
+      "src/components/component-storage-selector/dist/storage-selector.js",
       "src/components/widget-settings-ui-components/dist/js/**/*.js",
       "src/components/widget-settings-ui-core/dist/*.js",
       "src/components/bootstrap-form-components/dist/js/**/*.js",
