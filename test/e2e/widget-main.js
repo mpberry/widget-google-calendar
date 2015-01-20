@@ -5,7 +5,6 @@ var url = "http://localhost:"+e2ePort+"/src/widget-e2e.html";
 casper.test.begin("e2e Testing - UI", {
   setUp: function(test) {
     casper.options.clientScripts = [
-      "test/data/main.js",
       "test/calendar-api-mock.js"
     ];
   },
