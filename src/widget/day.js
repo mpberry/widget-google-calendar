@@ -23,7 +23,7 @@ RiseVision.Calendar.Day = function(params) {
       currentDate = events[0].start.dateTime ? events[0].start.dateTime : events[0].start.date,
       $day = $(".day").eq(pos);
 
-    if (params.showDate) {
+    if (params.showDate === undefined || params.showDate) {
       if (params.dateRange === "day") {
         date = "Today";
       }

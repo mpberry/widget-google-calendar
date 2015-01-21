@@ -15,7 +15,7 @@ RiseVision.Calendar.Event = (function () {
       showEnd = params.showEnd,
       duration = 0;
 
-    if (params.showTime) {
+    if (params.showTime === undefined || params.showTime) {
       if (timeFormat === "12hour") {
         timeFormat = "h:mma";
       }
@@ -25,7 +25,7 @@ RiseVision.Calendar.Event = (function () {
 
       // Start and End Times
       if (event.start && event.end && event.start.dateTime && event.end.dateTime) {
-        if (showEnd === "hour" || showEnd === "extended") {
+        if (showEnd !== undefined && (showEnd === "hour" || showEnd === "extended")) {
           // Event duration in minutes.
           duration = Math.round(moment(event.end.dateTime).diff(moment(event.start.dateTime)) / 60000);
 
@@ -39,7 +39,7 @@ RiseVision.Calendar.Event = (function () {
           }
         }
 
-        if (showEnd === "always") {
+        if (showEnd === undefined || showEnd === "always") {
           $day.find(".time").eq(pos).text(moment(event.start.dateTime).format(timeFormat) +
             " - " + moment(event.end.dateTime).format(timeFormat));
         }
@@ -52,21 +52,21 @@ RiseVision.Calendar.Event = (function () {
       $day.find(".time").eq(pos).hide();
     }
 
-    if (params.showTitle && event.summary) {
+    if ((params.showTitle === undefined || params.showTitle) && event.summary) {
       $day.find(".summary").eq(pos).html(event.summary);
     }
     else {
       $day.find(".summary").eq(pos).hide();
     }
 
-    if (params.showLocation && event.location) {
+    if ((params.showLocation === undefined || params.showLocation) && event.location) {
       $day.find(".location").eq(pos).html(event.location);
     }
     else {
       $day.find(".location").eq(pos).hide();
     }
 
-    if (params.showDescription && event.description) {
+    if ((params.showDescription === undefined || params.showDescription) && event.description) {
       $day.find(".description").eq(pos).html(event.description);
     }
     else {
