@@ -138,9 +138,8 @@ RiseVision.Calendar = (function (gadgets) {
         // Get all events for the current day.
         currentEvents = _.filter(events, getCurrentEvents);
 
-        /* Don't show events that have completed. Only applicable
-           for today's events. */
-        if (!params.showCompleted && (currentDay.diff(moment(), "days") === 0)) {
+        // Don't show events that have completed. Only applicable for today's events.
+        if (params.showCompleted !== undefined && !params.showCompleted && (currentDay.diff(moment(), "days") === 0)) {
           currentEvents = _.filter(currentEvents, removeCompletedEvents);
         }
 
