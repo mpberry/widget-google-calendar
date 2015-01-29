@@ -5,7 +5,7 @@
 The Google Calendar Widget allows users to show a public Google calendar in a Presentation.
 
 ### Custom Layouts
-A custom layout is defined inside an HTML file. This means that in order to build your own layout, you'll need to create an HTML page and mark the appropriate elements with IDs and CSS class names that will map them to the corresponding data and functionality. A good starting point may be to copy *widget.html* from the dist and make your customizations to this new version. You musto ensure that you grab the *css/widget.min.css* and *js/widget.min.js* files. These will need to be uploaded with the *widget.html* file (You may need to modify the paths to these files OR recreate the folder structure to match).
+A custom layout is defined inside an HTML file. This means that in order to build your own layout, you'll need to create an HTML page and mark the appropriate elements with IDs and CSS class names that will map them to the corresponding data and functionality. A good starting point may be to copy *widget.html* from the *dist* and make your customizations to this new version. You must ensure that you grab the *css/widget.min.css* and *js/widget.min.js* files too. These will need to be uploaded with the *widget.html* file (You may need to modify the paths to these files OR recreate the folder structure to match).
 
 The naming conventions that the Widget uses can be found below:
 
