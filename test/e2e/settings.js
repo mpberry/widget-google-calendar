@@ -189,7 +189,7 @@
     it("ng-invalid should be false when Use Default Layout is unchecked and a URL is entered", function () {
       element(by.css("input[name=calendar]")).sendKeys(calendarId);
       element(by.model("settings.additionalParams.layout.default")).click();
-      element(by.id("url")).sendKeys(customURL);
+      element(by.model("url")).sendKeys(customURL);
       expect(element(by.css("form[name=settingsForm].ng-invalid")).isPresent()).to.eventually.be.false;
     });
 
@@ -289,7 +289,7 @@
 
       element(by.model("settings.additionalParams.calendar")).sendKeys(calendarId);
       element(by.model("settings.additionalParams.layout.default")).click();
-      element(by.id("url")).sendKeys(customURL);
+      element(by.model("url")).sendKeys(customURL);
       element(by.id("save")).click();
 
       expect(browser.executeScript("return window.result")).to.eventually.deep.equal({
