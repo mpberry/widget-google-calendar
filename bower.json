@@ -42,6 +42,7 @@
   },
   "resolutions": {
     "jquery": "1.11.0",
+    "angular-bootstrap": "~0.11.1",
     "angular-translate": "~2.5.2",
     "angular-translate-loader-static-files": "~2.5.2",
     "underscore": "~1.7.0"
