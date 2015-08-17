@@ -31319,39 +31319,19 @@ angular.module("risevision.widget.common")
 });
 
 angular.module("risevision.widget.common")
-  .constant("STORAGE_URL_BASE", "storage.googleapis.com/risemedialibrary-")
-  .factory("commonSettings", ["$log", "STORAGE_URL_BASE", function ($log, STORAGE_URL_BASE) {
+  .constant("STORAGE_FILE_URL_BASE", "storage.googleapis.com/risemedialibrary-")
+  .constant("STORAGE_FOLDER_URL_BASE", "googleapis.com/storage/")
+  .factory("commonSettings", ["$log", "STORAGE_FILE_URL_BASE", "STORAGE_FOLDER_URL_BASE",
+    function ($log, STORAGE_FILE_URL_BASE, STORAGE_FOLDER_URL_BASE) {
 
     var factory = {
-      getStorageUrlData: function (url) {
-        var storage = {},
-          str, arr, params, pair;
-
-        if (url.indexOf(STORAGE_URL_BASE) !== -1) {
-          str = url.split(STORAGE_URL_BASE)[1];
-          str = decodeURIComponent(str.slice(str.indexOf("/") + 1));
-          arr = str.split("/");
-
-          storage.folder = (typeof arr[arr.length - 2] !== "undefined" && arr[arr.length - 2] !== null) ?
-            arr[arr.length - 2] : "";
-          storage.fileName = arr[arr.length - 1];
+      isStorageUrl: function (url) {
+        if ((url.indexOf(STORAGE_FILE_URL_BASE) !== -1) || (url.indexOf(STORAGE_FOLDER_URL_BASE) !== -1)) {
+          return true;
         }
-        // Check if a folder was selected.
         else {
-          params = url.split("?");
-
-          for (var i = 0; i < params.length; i++) {
-            pair = params[i].split("=");
-
-            if (pair[0] === "prefix") {
-              storage.folder = decodeURIComponent(pair[1]);
-              storage.fileName = "";
-              break;
-            }
-          }
+          return false;
         }
-
-        return storage;
       }
     };
 
@@ -31761,9 +31741,9 @@ angular.module("risevision.widget.googleCalendar.settings")
 }());
 
 (function(module) {
-try { app = angular.module("risevision.widget.common.widget-button-toolbar"); }
-catch(err) { app = angular.module("risevision.widget.common.widget-button-toolbar", []); }
-app.run(["$templateCache", function($templateCache) {
+try { module = angular.module("risevision.widget.common.widget-button-toolbar"); }
+catch(err) { module = angular.module("risevision.widget.common.widget-button-toolbar", []); }
+module.run(["$templateCache", function($templateCache) {
   "use strict";
   $templateCache.put("_angular/widget-button-toolbar/widget-button-toolbar.html",
     "<div class=\"btn-toolbar sticky-buttons\">\n" +
@@ -31821,7 +31801,8 @@ app.run(["$templateCache", function($templateCache) {
           $scope.defaultSetting = {
             by: "none",
             speed: "medium",
-            pause: 5
+            pause: 5,
+            pud: 10
           };
 
           $scope.defaults = function(obj) {
@@ -31848,53 +31829,51 @@ app.run(["$templateCache", function($templateCache) {
 }());
 
 (function(module) {
-try { app = angular.module("risevision.widget.common.scroll-setting"); }
-catch(err) { app = angular.module("risevision.widget.common.scroll-setting", []); }
-app.run(["$templateCache", function($templateCache) {
+try { module = angular.module("risevision.widget.common.scroll-setting"); }
+catch(err) { module = angular.module("risevision.widget.common.scroll-setting", []); }
+module.run(["$templateCache", function($templateCache) {
   "use strict";
   $templateCache.put("_angular/scroll-setting/scroll-setting.html",
-    "<div class=\"section\">\n" +
-    "  <h5>{{'scroll.heading' | translate}}</h5>\n" +
-    "  <div class=\"form-group\">\n" +
-    "    <div class=\"row\">\n" +
-    "      <div class=\"col-md-3\">\n" +
-    "        <label>{{'scroll.by.label' | translate}}</label>\n" +
-    "        <select id=\"scroll-by\" ng-model=\"scroll.by\" class=\"form-control\">\n" +
-    "          <option value=\"none\">{{'scroll.by.none' | translate}}</option>\n" +
-    "          <option value=\"continuous\">{{'scroll.by.continuous' | translate}}</option>\n" +
-    "          <option value=\"page\">{{'scroll.by.page' | translate}}</option>\n" +
-    "        </select>\n" +
+    "<div class=\"row\">\n" +
+    "  <div class=\"col-md-3\">\n" +
+    "    <div class=\"form-group\">\n" +
+    "      <label class=\"control-label\">{{\"scroll.heading\" | translate}}</label>\n" +
+    "      <select id=\"scroll-by\" ng-model=\"scroll.by\" class=\"form-control\">\n" +
+    "        <option value=\"none\">{{'scroll.by.none' | translate}}</option>\n" +
+    "        <option value=\"continuous\">{{'scroll.by.continuous' | translate}}</option>\n" +
+    "        <option value=\"page\">{{'scroll.by.page' | translate}}</option>\n" +
+    "      </select>\n" +
+    "    </div>\n" +
+    "  </div>\n" +
+    "  <div class=\"col-md-3\" ng-show=\"scroll.by != 'none'\">\n" +
+    "    <div class=\"form-group\">\n" +
+    "      <label class=\"control-label\">{{'scroll.speed.label' | translate}}</label>\n" +
+    "      <select id=\"scroll-speed\" ng-model=\"scroll.speed\" class=\"form-control\">\n" +
+    "        <option value=\"slowest\">{{'scroll.speed.slowest' | translate}}</option>\n" +
+    "        <option value=\"slow\">{{'scroll.speed.slow' | translate}}</option>\n" +
+    "        <option value=\"medium\">{{'scroll.speed.medium' | translate}}</option>\n" +
+    "        <option value=\"fast\">{{'scroll.speed.fast' | translate}}</option>\n" +
+    "        <option value=\"fastest\">{{'scroll.speed.fastest' | translate}}</option>\n" +
+    "      </select>\n" +
+    "    </div>\n" +
+    "  </div>\n" +
+    "  <div class=\"col-md-3\" ng-show=\"scroll.by != 'none'\">\n" +
+    "    <div class=\"form-group\">\n" +
+    "      <label class=\"control-label\">{{'scroll.pause.label' | translate}}</label>\n" +
+    "      <div class=\"input-group\">\n" +
+    "        <input id=\"scroll-pause\" type=\"number\" ng-model=\"scroll.pause\" class=\"form-control\" />\n" +
+    "        <span class=\"input-group-addon\">{{'common.units.seconds' | translate}}</span>\n" +
     "      </div>\n" +
     "    </div>\n" +
     "  </div>\n" +
-    "  <div ng-show=\"scroll.by != 'none'\" class=\"more-scroll-options\">\n" +
+    "  <div class=\"col-md-3\" ng-show=\"scroll.by != 'none'\">\n" +
     "    <div class=\"form-group\">\n" +
-    "      <label for=\"scroll-speed\">{{'scroll.speed.label' | translate}}</label>\n" +
-    "      <div class=\"row\">\n" +
-    "        <div class=\"col-md-3\">\n" +
-    "          <select id=\"scroll-speed\" ng-model=\"scroll.speed\" class=\"form-control\">\n" +
-    "            <option value=\"slowest\">{{'scroll.speed.slowest' | translate}}</option>\n" +
-    "            <option value=\"slow\">{{'scroll.speed.slow' | translate}}</option>\n" +
-    "            <option value=\"medium\">{{'scroll.speed.medium' | translate}}</option>\n" +
-    "            <option value=\"fast\">{{'scroll.speed.fast' | translate}}</option>\n" +
-    "            <option value=\"fastest\">{{'scroll.speed.fastest' | translate}}</option>\n" +
-    "          </select>\n" +
-    "        </div>\n" +
-    "      </div>\n" +
-    "    </div>\n" +
-    "    <div class=\"form-group\">\n" +
-    "      <label for=\"scroll-pause\">\n" +
-    "        {{'scroll.pause.label' | translate}}\n" +
-    "      </label>\n" +
-    "      <span popover=\"{{'scroll.pause.tooltip' | translate}}\"\n" +
-    "            popover-trigger=\"click\" popover-placement=\"right\" rv-tooltip></span>\n" +
-    "      <div class=\"row\">\n" +
-    "        <div class=\"col-md-3\">\n" +
-    "          <div class=\"input-group\">\n" +
-    "            <input id=\"scroll-pause\" type=\"number\" ng-model=\"scroll.pause\" class=\"form-control\" />\n" +
-    "            <span class=\"input-group-addon\">{{'common.units.seconds' | translate}}</span>\n" +
-    "          </div>\n" +
-    "        </div>\n" +
+    "      <label class=\"control-label\">{{'scroll.pud.label' | translate}}</label>\n" +
+    "      <span popover=\"{{'scroll.pud.tooltip' | translate}}\" popover-trigger=\"click\"\n" +
+    "        popover-placement=\"right\" rv-tooltip></span>\n" +
+    "      <div class=\"input-group\">\n" +
+    "        <input id=\"scroll-pud\" type=\"number\" ng-model=\"scroll.pud\" class=\"form-control\" />\n" +
+    "        <span class=\"input-group-addon\">{{'common.units.seconds' | translate}}</span>\n" +
     "      </div>\n" +
     "    </div>\n" +
     "  </div>\n" +
@@ -31989,21 +31968,24 @@ app.run(["$templateCache", function($templateCache) {
 }());
 
 (function(module) {
-try { app = angular.module("risevision.widget.common.font-setting"); }
-catch(err) { app = angular.module("risevision.widget.common.font-setting", []); }
-app.run(["$templateCache", function($templateCache) {
+try { module = angular.module("risevision.widget.common.font-setting"); }
+catch(err) { module = angular.module("risevision.widget.common.font-setting", []); }
+module.run(["$templateCache", function($templateCache) {
   "use strict";
   $templateCache.put("_angular/font-setting/font-setting.html",
-    "<div class=\"row\" class=\"font-settings\">\n" +
+    "<div class=\"row\">\n" +
     "  <div class=\"col-md-12\">\n" +
-    "    <ul class=\"list-inline\">\n" +
+    "    <ul class=\"list-inline font-setting\">\n" +
     "      <li class=\"pull-left\">\n" +
     "        <font-picker font=\"fontData.font\"></font-picker>\n" +
     "      </li>\n" +
     "      <li class=\"pull-left\">\n" +
     "        <font-size-picker ng-model=\"fontData.size\"></font-size-picker>\n" +
     "      </li>\n" +
-    "      <li class=\"pull-left font-setting-button\">\n" +
+    "      <li class=\"pull-left\" ng-if=\"!hideAlignment\">\n" +
+    "        <alignment align=\"fontData.align\" class=\"font-setting-button\"></alignment>\n" +
+    "      </li>\n" +
+    "      <li class=\"font-setting-button\">\n" +
     "        <font-style bold=\"fontData.bold\" italic=\"fontData.italic\" underline=\"fontData.underline\"></font-style>\n" +
     "      </li>\n" +
     "      <li class=\"pull-left font-setting-button\">\n" +
@@ -32011,9 +31993,6 @@ app.run(["$templateCache", function($templateCache) {
     "      </li>\n" +
     "      <li class=\"pull-left font-setting-button\">\n" +
     "        <input color-picker type=\"highlight\" color=\"fontData.highlightColor\" />\n" +
-    "      </li>\n" +
-    "      <li class=\"pull-left\" ng-if=\"!hideAlignment\">\n" +
-    "        <alignment align=\"fontData.align\" class=\"font-setting-button\"></alignment>\n" +
     "      </li>\n" +
     "    </ul>\n" +
     "  </div>\n" +
@@ -32176,7 +32155,8 @@ app.run(["$templateCache", function($templateCache) {
           hideLabel: "@",
           hideStorage: "@",
           companyId: "@",
-          fileType: "@"
+          fileType: "@",
+          storageType: "@"
         },
         template: $templateCache.get("_angular/url-field/url-field.html"),
         link: function (scope, element, attrs, ctrl) {
@@ -32190,7 +32170,7 @@ app.run(["$templateCache", function($templateCache) {
                 extensions = [".jpg", ".jpeg", ".png", ".bmp", ".svg", ".gif"];
                 break;
               case "video":
-                extensions = [".webm"];
+                extensions = [".webm", ".mp4", ".ogv", ".ogg"];
                 break;
               default:
                 extensions = [];
@@ -32219,9 +32199,7 @@ app.run(["$templateCache", function($templateCache) {
              Reasoning
              http://mathiasbynens.be/demo/url-regex */
 
-            /* jshint ignore:start */
-            urlRegExp = /^(?:(?:https?|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:\/[^\s]*)?$/i;
-            /* jshint ignore:end */
+            urlRegExp = /^(?:(?:https?|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:\/[^\s]*)?$/i; // jshint ignore:line
 
             // Add http:// if no protocol parameter exists
             if (value.indexOf("://") === -1) {
@@ -32251,7 +32229,7 @@ app.run(["$templateCache", function($templateCache) {
 
           scope.invalidType = "url";
 
-          scope.allowInitEmpty = (typeof attrs.initEmpty !== "undefined") ? true : false;
+          scope.allowInitEmpty = (typeof attrs.initEmpty !== "undefined");
 
           if (!scope.hideStorage) {
             scope.$on("picked", function (event, data) {
@@ -32305,16 +32283,16 @@ app.run(["$templateCache", function($templateCache) {
 }());
 
 (function(module) {
-try { app = angular.module("risevision.widget.common.url-field"); }
-catch(err) { app = angular.module("risevision.widget.common.url-field", []); }
-app.run(["$templateCache", function($templateCache) {
+try { module = angular.module("risevision.widget.common.url-field"); }
+catch(err) { module = angular.module("risevision.widget.common.url-field", []); }
+module.run(["$templateCache", function($templateCache) {
   "use strict";
   $templateCache.put("_angular/url-field/url-field.html",
     "<div class=\"form-group\" >\n" +
     "  <label ng-if=\"!hideLabel\">{{ \"url.label\" | translate }}</label>\n" +
     "  <div ng-class=\"{'input-group':!hideStorage}\">\n" +
     "    <input name=\"url\" type=\"text\" ng-model=\"url\" ng-blur=\"blur()\" class=\"form-control\" placeholder=\"http://\">\n" +
-    "    <span class=\"input-url-addon\" ng-if=\"!hideStorage\"><storage-selector company-id=\"{{companyId}}\"></storage-selector></span>\n" +
+    "    <span class=\"input-url-addon\" ng-if=\"!hideStorage\"><storage-selector company-id=\"{{companyId}}\" type=\"{{storageType}}\"></storage-selector></span>\n" +
     "  </div>\n" +
     "  <p ng-if=\"!valid && invalidType === 'url'\" class=\"text-danger\">{{ \"url.errors.url\" | translate }}</p>\n" +
     "  <p ng-if=\"!valid && invalidType === 'image'\" class=\"text-danger\">{{ \"url.errors.image\" | translate }}</p>\n" +
@@ -32322,10 +32300,8 @@ app.run(["$templateCache", function($templateCache) {
     "  <div class=\"checkbox\" ng-show=\"forcedValid || !valid\">\n" +
     "    <label>\n" +
     "      <input name=\"validate-url\" ng-click=\"doValidation = !doValidation\" type=\"checkbox\"\n" +
-    "             value=\"validate-url\" checked=\"checked\"> {{\"url.validate.label\" | translate}}\n" +
+    "             value=\"validate-url\"> {{\"url.validate.label\" | translate}}\n" +
     "    </label>\n" +
-    "    <span popover=\"{{'url.validate.tooltip' | translate}}\" popover-trigger=\"click\"\n" +
-    "          popover-placement=\"top\" rv-tooltip></span>\n" +
     "  </div>\n" +
     "</div>\n" +
     "");

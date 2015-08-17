@@ -7,7 +7,7 @@ RiseVision.Calendar = (function (gadgets) {
   "use strict";
 
   var params,
-    timeoutID,
+    pudTimerID,
     fragment,
     daysNode,
     isLoading = true,
@@ -31,7 +31,7 @@ RiseVision.Calendar = (function (gadgets) {
 
           // Network error. Retry later.
           if (reason.result.error.code && reason.result.error.code === -1) {
-            startTimer();
+            startRefreshTimer();
           }
           else {
             $(".error").show();
@@ -171,7 +171,7 @@ RiseVision.Calendar = (function (gadgets) {
       calendarDays[i].addDay(i);
     }
 
-    startTimer();
+    startRefreshTimer();
 
     if (isLoading) {
       if ($container) {
@@ -214,10 +214,27 @@ RiseVision.Calendar = (function (gadgets) {
     }
   }
 
-  function startTimer() {
+  // Check if there is enough content to scroll.
+  function canScroll() {
+    return params.scroll.by !== "none" && $container.data("plugin_autoScroll") &&
+      $container.data("plugin_autoScroll").canScroll();
+  }
+
+  // If there is not enough content to scroll, use the PUD Failover setting as the trigger
+  // for sending "done".
+  function startPUDTimer() {
+    var delay = (params.scroll.pud === undefined ? 10 : params.scroll.pud) * 1000;
+
+    pudTimerID = setTimeout(function() {
+      refresh();
+      done();
+    }, delay);
+  }
+
+  function startRefreshTimer() {
     var delay = 300000; /* 5 minutes */
 
-    timeoutID = setTimeout(function() {
+    setTimeout(function() {
       isExpired = true;
 
       // Refresh immediately if the content is not scrolling.
@@ -229,8 +246,8 @@ RiseVision.Calendar = (function (gadgets) {
 
   function refresh() {
     if (isExpired) {
-      getEventsList();
       isExpired = false;
+      getEventsList();
     }
   }
 
@@ -295,14 +312,24 @@ RiseVision.Calendar = (function (gadgets) {
   }
 
   function play() {
-    if ($container.data("plugin_autoScroll")) {
-      $container.data("plugin_autoScroll").play();
+    if (canScroll()) {
+      if ($container.data("plugin_autoScroll")) {
+        $container.data("plugin_autoScroll").play();
+      }
+    }
+    else {
+      startPUDTimer();
     }
   }
 
   function pause() {
     if ($container.data("plugin_autoScroll")) {
       $container.data("plugin_autoScroll").pause();
+    }
+
+    // Clear the PUD timer if the playlist item is not set to PUD.
+    if (pudTimerID) {
+      clearTimeout(pudTimerID);
     }
   }
 

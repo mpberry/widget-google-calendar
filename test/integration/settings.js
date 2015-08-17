@@ -205,7 +205,8 @@
           "scroll": {
             "by": "none",
             "speed": "medium",
-            "pause": 5
+            "pause": 5,
+            "pud": 10
           },
           "showDate": true,
           "dateRange": "day",
