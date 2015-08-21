@@ -3,7 +3,6 @@
 (function () {
   "use strict";
 
-
   var bump = require("gulp-bump");
   var concat = require("gulp-concat");
   var del = require("del");
@@ -33,7 +32,7 @@
   });
 
   gulp.task("config", function() {
-    var env = process.env.NODE_ENV || "dev";
+    var env = process.env.NODE_ENV || "prod";
     gutil.log("Environment is", env);
 
     return gulp.src(["./src/config/" + env + ".js"])
@@ -96,44 +95,44 @@
 
   gulp.task("webdriver_update", factory.webdriveUpdate());
 
-  // e2e testing
+  // Integration testing
   // Settings
-  gulp.task("html:e2e:settings", factory.htmlE2E({
+  gulp.task("html:integration:settings", factory.htmlE2E({
     files: htmlFiles,
     e2eClient: "../test/calendar-api-mock.js",
     e2eMockData: "../test/data/main.js"
   }));
 
-  gulp.task("e2e:server:settings", ["config", "html:e2e:settings"], factory.testServer());
+  gulp.task("integration:server:settings", ["config", "html:integration:settings"], factory.testServer());
 
-  gulp.task("test:e2e:settings:run", ["webdriver_update"], factory.testE2EAngular({
-    testFiles: "test/e2e/settings.js"}
+  gulp.task("test:integration:settings:run", ["webdriver_update"], factory.testE2EAngular({
+    testFiles: "test/integration/settings.js"}
   ));
 
-  gulp.task("test:e2e:settings", function(cb) {
-    runSequence(["html:e2e:settings", "e2e:server:settings"], "test:e2e:settings:run", "e2e:server-close", cb);
+  gulp.task("test:integration:settings", function(cb) {
+    runSequence(["html:integration:settings", "integration:server:settings"], "test:integration:settings:run", "integration:server-close", cb);
   });
 
   // Widget
-  gulp.task("html:e2e:widget", factory.htmlE2E({
+  gulp.task("html:integration:widget", factory.htmlE2E({
     files: htmlFiles,
     e2eMockData: "../test/data/main.js"
   }));
 
-  gulp.task("e2e:server:widget", ["config", "html:e2e:widget"], factory.testServer());
+  gulp.task("integration:server:widget", ["config", "html:integration:widget"], factory.testServer());
 
-  gulp.task("test:e2e:widget:run", factory.testE2E({
-    testFiles: "test/e2e/widget-*.js"
+  gulp.task("test:integration:widget:run", factory.testE2E({
+    testFiles: "test/integration/widget-*.js"
   }));
 
-  gulp.task("test:e2e:widget", function(cb) {
-    runSequence(["html:e2e:widget", "e2e:server:widget"], "test:e2e:widget:run", "e2e:server-close", cb);
+  gulp.task("test:integration:widget", function(cb) {
+    runSequence(["html:integration:widget", "integration:server:widget"], "test:integration:widget:run", "integration:server-close", cb);
   });
 
-  gulp.task("e2e:server-close", factory.testServerClose());
+  gulp.task("integration:server-close", factory.testServerClose());
 
-  gulp.task("test:e2e", function(cb) {
-    runSequence("test:e2e:settings", "test:e2e:widget", cb);
+  gulp.task("test:integration", function(cb) {
+    runSequence("test:integration:settings", "test:integration:widget", cb);
   });
 
   // Unit testing
@@ -185,10 +184,8 @@
     runSequence("test:unit:settings", "test:unit:widget", cb);
   });
 
-  gulp.task("test:metrics", factory.metrics());
-
   gulp.task("test", function(cb) {
-    runSequence("test:e2e", "test:unit", "test:metrics", cb);
+    runSequence("test:integration", "test:unit", cb);
   });
 
   gulp.task("build", function (cb) {
