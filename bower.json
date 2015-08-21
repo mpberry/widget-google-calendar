@@ -39,7 +39,7 @@
     "underscore": "~1.8.3",
     "widget-common": "https://github.com/Rise-Vision/widget-common.git#0.1.10",
     "widget-settings-ui-components": "https://github.com/Rise-Vision/widget-settings-ui-components.git#1.0.0",
-    "widget-settings-ui-core": "https://github.com/Rise-Vision/widget-settings-ui-core.git#0.1.12"
+    "widget-settings-ui-core": "https://github.com/Rise-Vision/widget-settings-ui-core.git#0.1.11"
   },
   "resolutions": {
     "angular": "1.2.18",
