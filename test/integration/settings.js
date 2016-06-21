@@ -95,7 +95,7 @@
     });
 
     it("Date Format should be shown when Date Range is 12 Months", function () {
-      element(by.cssContainingText("option", "12 Months")).click();
+      element(by.name("date-range")).element(by.css("option[value='12months']")).click();
       expect(element(by.id("date-format")).isDisplayed()).to.eventually.be.true;
     });
 
@@ -194,7 +194,7 @@
     });
 
     // Saving
-    it("Should correctly save settings", function (done) {
+    it("Should correctly save settings", function () {
       var settings = {
         "params": {
           "layoutURL": ""

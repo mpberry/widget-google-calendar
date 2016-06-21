@@ -29942,95 +29942,6 @@ var RiseVision = RiseVision || {};
 
 RiseVision.Common = RiseVision.Common || {};
 
-RiseVision.Common.Validation = (function() {
-  "use strict";
-
-  /*
-  Defining the regular expressions being used
-   */
-  var urlRegExp = /^(?:(?:https?|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:\/[^\s]*)?$/i,
-      numericRegex = /^(\-|\+)?([0-9]+|Infinity)$/,
-      decimalRegex = /^\-?[0-9]*\.?[0-9]+$/;
-
-  function greaterThan(element, param) {
-    var value = element.value.trim();
-
-    if (!decimalRegex.test(value)) {
-      return false;
-    }
-
-    return (parseFloat(value) > parseFloat(param));
-  }
-
-  function lessThan(element, param) {
-    var value = element.value.trim();
-
-    if (!decimalRegex.test(value)) {
-      return false;
-    }
-
-    return (parseFloat(value) < parseFloat(param));
-  }
-
-  function numeric(element){
-    var value = element.value.trim();
-
-    /*
-     Regexp being used is stricter than parseInt. Using regular expression as
-     mentioned on mozilla
-     https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/
-     Global_Objects/parseInt
-     */
-    return numericRegex.test(value);
-  }
-
-  function required(element){
-    var value = element.value.trim(),
-        valid = false;
-
-    if (element.type === "checkbox" || element.type === "radio") {
-      if(element.checked === true) {
-        valid = true;
-      }
-    } else {
-      if (value !== null && value !== '') {
-        valid = true;
-      }
-    }
-
-    return valid;
-  }
-
-  function url(element){
-    var value = element.value.trim();
-
-    // Add http:// if no protocol parameter exists
-    if (value.indexOf("://") === -1) {
-      value = "http://" + value;
-    }
-    /*
-     Discussion
-     http://stackoverflow.com/questions/37684/how-to-replace-plain-urls-
-     with-links#21925491
-
-     Using
-     https://gist.github.com/dperini/729294
-     Reasoning
-     http://mathiasbynens.be/demo/url-regex
-
-     */
-    return urlRegExp.test(value);
-  }
-
-  return {
-    isGreaterThan: greaterThan,
-    isLessThan: lessThan,
-    isValidRequired: required,
-    isValidURL: url,
-    isValidNumber: numeric
-  };
-})();
-
 RiseVision.Common.Utilities = (function() {
 
   function getFontCssStyle(className, fontObj) {
@@ -30129,12 +30040,40 @@ RiseVision.Common.Utilities = (function() {
     }
   }
 
+  function preloadImages(urls) {
+    var length = urls.length,
+      images = [];
+
+    for (var i = 0; i < length; i++) {
+      images[i] = new Image();
+      images[i].src = urls[i];
+    }
+  }
+
+  function getQueryParameter(param) {
+    var query = window.location.search.substring(1),
+      vars = query.split("&"),
+      pair;
+
+    for (var i = 0; i < vars.length; i++) {
+      pair = vars[i].split("=");
+
+      if (pair[0] == param) {
+        return decodeURIComponent(pair[1]);
+      }
+    }
+
+    return "";
+  }
+
   return {
+    getQueryParameter: getQueryParameter,
     getFontCssStyle:  getFontCssStyle,
     addCSSRules:      addCSSRules,
     loadFonts:        loadFonts,
     loadCustomFont:   loadCustomFont,
-    loadGoogleFont:   loadGoogleFont
+    loadGoogleFont:   loadGoogleFont,
+    preloadImages:    preloadImages
   };
 })();
 
@@ -30176,7 +30115,6 @@ RiseVision.Common.Utilities = (function() {
     function _init() {
       // Get the HTML markup from the template.
       $element.append(TEMPLATES['font-picker-template.html']);
-
       $selectBox = $element.find(".bfh-selectbox");
       $family = $element.find(".font-family");
       $customFont = $element.find(".custom-font");
@@ -30324,6 +30262,12 @@ RiseVision.Common.Utilities = (function() {
         .append(moreFonts);
     }
 
+    /* Select a particular font in the drop-down. */
+    function _selectFont(family) {
+      $selectBox.find(".bfh-selectbox-option").data("option", family).html(family);
+      $selectBox.find(".font-family").val(family);
+    }
+
     /*
      *  Public Methods
      */
@@ -30408,17 +30352,15 @@ RiseVision.Common.Utilities = (function() {
       // Load it.
       utils.loadGoogleFont(family, contentDocument);
 
-      // Remove previous Google font, if applicable, and add the new one.
-      //$options.find("li.google-font").remove();
-      $options.prepend("<li class='google-font'><a tabindex='-1' href='#' " +
-        "style='font-family: Google' data-option='" + family + "'>" + family +
-        "</a></li>");
+      // Check that the font has not already been added.
+      if ($options.find("li.google-font a[data-option='" + family + "']").length === 0) {
+        $options.prepend("<li class='google-font'><a tabindex='-1' href='#' " +
+          "style='font-family: Google' data-option='" + family + "'>" + family +
+          "</a></li>");
+      }
 
-      // Set Google font as default and sort.
       if (isSelected) {
-        $selectBox.find(".bfh-selectbox-option").data("option", family)
-          .html(family);
-        $selectBox.find(".font-family").val(family);
+        _selectFont(family);
       }
 
       _sortFontList();
@@ -30435,14 +30377,14 @@ RiseVision.Common.Utilities = (function() {
     _init();
 
     return {
-      getFont:       getFont,
-      getFontStyle:  getFontStyle,
-      getFontURL:    getFontURL,
-      setFont:       setFont,
-      reset:         reset,
-      setContentDoc: setContentDocument,
-      addGoogleFont: addGoogleFont,
-      addCustomFont: addCustomFont
+      "getFont":       getFont,
+      "getFontStyle":  getFontStyle,
+      "getFontURL":    getFontURL,
+      "setFont":       setFont,
+      "reset":         reset,
+      "setContentDoc": setContentDocument,
+      "addGoogleFont": addGoogleFont,
+      "addCustomFont": addCustomFont
     };
   }
 
@@ -31214,13 +31156,10 @@ if (typeof WIDGET_SETTINGS_UI_CONFIG === "undefined") {
     });
 }());
 
-/* global config: true */
 /* exported config */
-if (typeof config === "undefined") {
-  var config = {
-    apiKey: "AIzaSyBXxVK_IOV7LNQMuVVo_l7ZvN53ejN86zY"
-  };
-}
+var config = {
+  apiKey: "AIzaSyBXxVK_IOV7LNQMuVVo_l7ZvN53ejN86zY"
+};
 
 if (typeof angular !== "undefined") {
   angular.module("risevision.widget.googleCalendar.config", [])
@@ -32055,7 +31994,7 @@ module.run(["$templateCache", function($templateCache) {
 
 if (typeof angular !== "undefined") {
   angular.module("risevision.widget.common.storage-selector.config", [])
-    .value("STORAGE_MODAL", "https://storage.risevision.com/files/");
+    .value("STORAGE_MODAL", "https://apps.risevision.com/storage-selector.html#/?cid=");
 }
 
 (function () {
@@ -32072,14 +32011,16 @@ if (typeof angular !== "undefined") {
         restrict: "EA",
         scope : {
           companyId : "@",
-          type: "@"
+          type: "@",
+          label: "@",
+          selected: "="
         },
         template: $templateCache.get("storage-selector.html"),
         link: function (scope) {
 
           function updateStorageUrl() {
             if (typeof scope.type !== "undefined" && scope.type !== "") {
-              scope.storageUrl = STORAGE_MODAL + scope.companyId + "?selector-type=" + scope.type;
+              scope.storageUrl = STORAGE_MODAL + scope.companyId + "&selector-type=" + scope.type;
             } else {
               // If no "type" value then omit the selector-type param to allow In-App Storage to apply a default
               scope.storageUrl = STORAGE_MODAL + scope.companyId;
@@ -32093,7 +32034,7 @@ if (typeof angular !== "undefined") {
             scope.modalInstance = $modal.open({
               templateUrl: "storage.html",
               controller: "StorageCtrl",
-              size: "lg",
+              size: "md",
               backdrop: true,
               resolve: {
                 storageUrl: function () {
@@ -32106,8 +32047,10 @@ if (typeof angular !== "undefined") {
               // for unit test purposes
               scope.files = files;
 
-              // emit an event with name "files", passing the array of files selected from storage
-              scope.$emit("picked", files);
+              $log.info("Picked: ", files);
+
+              // emit an event with name "files", passing the array of files selected from storage and the selector type
+              scope.$emit("picked", files, scope.type);
 
             }, function () {
               // for unit test purposes
@@ -32170,12 +32113,15 @@ angular.module("risevision.widget.common.storage-selector")
   }]);
 
 (function(module) {
-try { app = angular.module("risevision.widget.common.storage-selector"); }
-catch(err) { app = angular.module("risevision.widget.common.storage-selector", []); }
-app.run(["$templateCache", function($templateCache) {
+try { module = angular.module("risevision.widget.common.storage-selector"); }
+catch(err) { module = angular.module("risevision.widget.common.storage-selector", []); }
+module.run(["$templateCache", function($templateCache) {
   "use strict";
   $templateCache.put("storage-selector.html",
-    "<button class=\"btn btn-widget-icon-storage\" ng-click=\"open()\" type=\"button\" />\n" +
+    "<button class=\"btn btn-default\" ng-class=\"{active: selected}\" ng-click=\"open()\" type=\"button\" >\n" +
+    "  {{ label }}<img src=\"http://s3.amazonaws.com/Rise-Images/Icons/storage.png\" class=\"storage-selector-icon\" ng-class=\"{'icon-right': label}\">\n" +
+    "</button>\n" +
+    "\n" +
     "<script type=\"text/ng-template\" id=\"storage.html\">\n" +
     "        <iframe class=\"modal-dialog\" scrolling=\"no\" marginwidth=\"0\" src=\"{{ storageUrl.url }}\"></iframe>\n" +
     "</script>\n" +
