@@ -41,6 +41,25 @@ casper.test.begin("e2e Testing - UI", {
           totalEvents = 11;
         }
 
+        var width = this.evaluate(function() {
+          return document.getElementById("container").style.width;
+        });
+
+        var height = this.evaluate(function() {
+          return document.getElementById("container").style.height;
+        });
+
+        var windowWidth = this.evaluate(function() {
+          return window.innerWidth;
+        });
+
+        var windowHeight = this.evaluate(function() {
+          return window.innerHeight;
+        });
+
+        test.assertEquals(width, windowWidth + "px", "Container width");
+        test.assertEquals(height, windowHeight + "px", "Container height");
+
         test.assertElementCount(".day", 7, "Total number of days");
         test.assertElementCount(".day:nth-child(1) .event", todaysEvents, "Total number of today's events");
         test.assertElementCount(".event", totalEvents, "Total number of all events");

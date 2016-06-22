@@ -1,10 +1,7 @@
-/* global config: true */
 /* exported config */
-if (typeof config === "undefined") {
-  var config = {
-    apiKey: "AIzaSyBXxVK_IOV7LNQMuVVo_l7ZvN53ejN86zY"
-  };
-}
+var config = {
+  apiKey: "AIzaSyBXxVK_IOV7LNQMuVVo_l7ZvN53ejN86zY"
+};
 
 if (typeof angular !== "undefined") {
   angular.module("risevision.widget.googleCalendar.config", [])

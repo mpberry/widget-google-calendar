@@ -305,7 +305,9 @@ RiseVision.Calendar = (function (gadgets) {
           }
         }
 
+        $container.width(prefs.getInt("rsW"));
         $container.height(prefs.getInt("rsH"));
+
         getEventsList();
       }
     }
