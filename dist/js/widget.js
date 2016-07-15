@@ -5486,7 +5486,14 @@ RiseVision.Calendar = (function (gadgets) {
   // If there is not enough content to scroll, use the PUD Failover setting as the trigger
   // for sending "done".
   function startPUDTimer() {
-    var delay = (params.scroll.pud === undefined ? 10 : params.scroll.pud) * 1000;
+    var delay;
+
+    if ((params.scroll.pud === undefined) || (params.scroll.pud < 1)) {
+      delay = 10000;
+    }
+    else {
+      delay = params.scroll.pud * 1000;
+    }
 
     pudTimerID = setTimeout(function() {
       refresh();
