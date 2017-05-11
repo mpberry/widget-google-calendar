@@ -15,11 +15,43 @@ RiseVision.Calendar = (function (gadgets) {
     currentDay,
     prefs = new gadgets.Prefs(),
     utils = RiseVision.Common.Utilities,
-    $container = $("#container");
+    $container = $("#container"),
+    viewerPaused = true;
 
   /*
    *  Private Methods
    */
+  function getScrollEl() {
+    if ( typeof $container.data( "plugin_autoScroll" ) !== "undefined" ) {
+      return $container.data( "plugin_autoScroll" );
+    }
+
+    return null;
+  }
+
+  function onScrollDone() {
+    refresh();
+    done();
+  }
+
+  function removeAutoscroll() {
+    var $scroll = getScrollEl();
+
+    if ( $scroll ) {
+      $scroll.pause();
+      // remove the "done" event handler before destroying
+      $( "#container" ).autoScroll().off( "done", onScrollDone );
+      // destroy the auto scroll instance
+      $scroll.destroy();
+    }
+  }
+
+  function applyAutoScroll() {
+    if ( !getScrollEl() ) {
+      $container.autoScroll( params.scroll ).on( "done", onScrollDone );
+    }
+  }
+
   function getEventsList() {
     RiseVision.Calendar.Provider.getEventsList(params, {
       "success": addEvents,
@@ -172,18 +204,16 @@ RiseVision.Calendar = (function (gadgets) {
     }
 
     startRefreshTimer();
+    removeAutoscroll();
+    applyAutoScroll();
 
-    if (isLoading) {
-      if ($container) {
-        $container.autoScroll(params.scroll)
-          .on("done", function() {
-            refresh();
-            done();
-          });
-      }
-
+    if ( isLoading ) {
       isLoading = false;
       ready();
+    } else {
+      if (!viewerPaused) {
+        play();
+      }
     }
   }
 
@@ -216,8 +246,9 @@ RiseVision.Calendar = (function (gadgets) {
 
   // Check if there is enough content to scroll.
   function canScroll() {
-    return params.scroll.by !== "none" && $container.data("plugin_autoScroll") &&
-      $container.data("plugin_autoScroll").canScroll();
+    var $scroll = getScrollEl();
+
+    return params.scroll.by !== "none" && $scroll && $scroll.canScroll();
   }
 
   // If there is not enough content to scroll, use the PUD Failover setting as the trigger
@@ -238,6 +269,13 @@ RiseVision.Calendar = (function (gadgets) {
     }, delay);
   }
 
+  function stopPUDTimer() {
+    if (pudTimerID) {
+      clearTimeout(pudTimerID);
+      pudTimerID = null;
+    }
+  }
+
   function startRefreshTimer() {
     var delay = 300000; /* 5 minutes */
 
@@ -245,7 +283,7 @@ RiseVision.Calendar = (function (gadgets) {
       isExpired = true;
 
       // Refresh immediately if the content is not scrolling.
-      if (!$container.data("plugin_autoScroll").canScroll()) {
+      if (!canScroll()) {
         refresh();
       }
     }, delay);
@@ -254,6 +292,7 @@ RiseVision.Calendar = (function (gadgets) {
   function refresh() {
     if (isExpired) {
       isExpired = false;
+      stopPUDTimer();
       getEventsList();
     }
   }
@@ -321,10 +360,12 @@ RiseVision.Calendar = (function (gadgets) {
   }
 
   function play() {
-    if (canScroll()) {
-      if ($container.data("plugin_autoScroll")) {
-        $container.data("plugin_autoScroll").play();
-      }
+    var $scroll = getScrollEl();
+
+    viewerPaused = false;
+
+    if ( $scroll && canScroll() ) {
+      $scroll.play();
     }
     else {
       startPUDTimer();
@@ -332,6 +373,8 @@ RiseVision.Calendar = (function (gadgets) {
   }
 
   function pause() {
+    viewerPaused = true;
+
     if ($container.data("plugin_autoScroll")) {
       $container.data("plugin_autoScroll").pause();
     }
