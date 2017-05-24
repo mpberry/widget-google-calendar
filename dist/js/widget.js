@@ -5306,6 +5306,8 @@ RiseVision.Calendar = (function (gadgets) {
       $( "#container" ).autoScroll().off( "done", onScrollDone );
       // destroy the auto scroll instance
       $scroll.destroy();
+      // remove the applied visibility and opacity styling applied by auto-scroll plugin
+      $container.find(".page").removeAttr("style");
     }
   }
 
@@ -5636,16 +5638,16 @@ RiseVision.Calendar = (function (gadgets) {
   }
 
   function pause() {
+    var $scroll = getScrollEl();
+
     viewerPaused = true;
 
-    if ($container.data("plugin_autoScroll")) {
-      $container.data("plugin_autoScroll").pause();
+    if ( $scroll && canScroll() ) {
+      $scroll.pause();
     }
 
     // Clear the PUD timer if the playlist item is not set to PUD.
-    if (pudTimerID) {
-      clearTimeout(pudTimerID);
-    }
+    stopPUDTimer();
   }
 
   function stop() {
