@@ -23,27 +23,22 @@ RiseVision.Calendar.Day = function(params) {
       currentDate = events[0].start.dateTime ? events[0].start.dateTime : events[0].start.date,
       $day = $(".day").eq(pos);
 
-    if (params.showDate === undefined || params.showDate) {
-      if (params.dateRange === "day") {
+    if (params.dateRange === "day") {
+      date = "Today";
+    }
+    else if (params.dateRange === "week") {
+      if (moment(currentDate).isSame(moment(), "day")) {
         date = "Today";
       }
-      else if (params.dateRange === "week") {
-        if (moment(currentDate).isSame(moment(), "day")) {
-          date = "Today";
-        }
-        else {
-          date = moment(currentDate).format("dddd");
-        }
-      }
       else {
-        date = moment(currentDate).format(params.dateFormat);
+        date = moment(currentDate).format("dddd");
       }
-
-      $day.find(".date").text(date);
     }
     else {
-      $day.find(".date").hide();
+      date = moment(currentDate).format(params.dateFormat);
     }
+
+    $day.find(".date").text(date);
 
     // Clone the UI for each additional event after the first.
     for (i = 1, length = events.length; i < length; i++) {
@@ -52,7 +47,7 @@ RiseVision.Calendar.Day = function(params) {
 
     // Add all of the events for the current day.
     $.each(events, function(index, value) {
-      RiseVision.Calendar.Event.addEvent($day, index, value, params);
+      RiseVision.Calendar.Event.addEvent($day, index, value, params.timeFormat);
     });
   }
 
