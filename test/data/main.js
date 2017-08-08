@@ -6,14 +6,18 @@
 
   window.gadget.settings = {
     "params": {
+      "layoutURL": ""
     },
     "additionalParams": {
       "calendar": "calendarID",
+      "showCompleted": false,
       "scroll": {
         "by": "none",
         "speed": "medium",
-        "pause": 5
+        "pause": 5,
+        "pud": 10
       },
+      "showDate": true,
       "dateRange": "12months",
       "dateFormat": "D/M/YYYY",
       "dateFont": {
@@ -27,7 +31,9 @@
         "color": "black",
         "highlightColor": "transparent"
       },
+      "showTime": true,
       "timeFormat": "12hour",
+      "showEnd": "always",
       "timeFont": {
         "font": {
           "family": "Verdana"
@@ -39,6 +45,7 @@
         "color": "black",
         "highlightColor": "transparent"
       },
+      "showTitle": true,
       "titleFont": {
         "font": {
           "family": "Verdana"
@@ -50,6 +57,7 @@
         "color": "black",
         "highlightColor": "transparent"
       },
+      "showLocation": true,
       "locationFont": {
         "font": {
           "family": "Verdana"
@@ -61,6 +69,7 @@
         "color": "black",
         "highlightColor": "transparent"
       },
+      "showDescription": true,
       "descriptionFont": {
         "font": {
           "family": "Verdana"
@@ -71,6 +80,10 @@
         "underline": false,
         "color": "black",
         "highlightColor": "transparent"
+      },
+      "layout": {
+        "default": true,
+        "customURL": ""
       }
     }
   };
